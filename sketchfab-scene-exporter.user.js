@@ -4,7 +4,7 @@
 // @author         Reinitialized
 //
 //Version Number
-// @version        1.04
+// @version        1.05
 //
 // Urls process this user script on
 // @include        /^https?://(www\.)?sketchfab\.com/models/.*/embed.*$/
@@ -248,7 +248,9 @@ observeDOM(document.body, function(){
     if (!addedDownloadButton) {
         if (downloadButtonParent = getElementByXpath(downloadButtonParentXPath))
         {
-           addDownloadButton(downloadButtonParent);
+            setTimeout(function () {
+                addDownloadButton(downloadButtonParent);
+            }, 2000);
 	   addedDownloadButton = true;
         }
     }
