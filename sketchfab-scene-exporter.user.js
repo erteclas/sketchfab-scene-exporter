@@ -4,7 +4,7 @@
 // @author         Reinitialized
 //
 //Version Number
-// @version        1.05
+// @version        1.06
 //
 // Urls process this user script on
 // @include        /^https?://(www\.)?sketchfab\.com/models/.*/embed.*$/
@@ -20,7 +20,9 @@ function overrideDrawImplementation() {
         if (!this.computedOBJ) {
             this.computedOBJ = true;
             this.name = baseModelName + '-' + models.length;
-            this.textures = textureInfoForGeometry(this);
+            this.__defineGetter__("textures", function() {
+                return this._textures ? this._textures : this._textures = textureInfoForGeometry(this);
+            });
             models.push({
                 name: this.name,
                 geom: this,
@@ -30,7 +32,9 @@ function overrideDrawImplementation() {
                 get mtl() {
                     return MTLforGeometry(this.geom);
                 },
-                textures: this.textures
+                get textures() {
+                    return this.geom.textures;
+                }
             });
         }
     };
@@ -165,18 +169,21 @@ function textureInfoForGeometry(geom) {
     if (stateset = geom.stateset) {
         if (textures = stateset.textureAttributeMapList) {
             textures.forEach(function(texture) {
-                var object = texture.Texture._object;
-                if (texture = object._texture) {
-                    if (imageProxy = texture._imageProxy) {
-                        var textureURL = imageProxy.attributes.images[0].url;
-                        var texture = {
-                            url: textureURL,
-                            type: textureMTLMap[object._channel._name],
-                            ext: ext(textureURL)
-                        };
-                        texture.filename = textureFilename(geom, texture);
-                        textureMap.push(texture);
-                    }   
+                if (Texture = texture.Texture) {
+                    if (object = Texture._object) {
+                        if (texture = object._texture) {
+                            if (imageProxy = texture._imageProxy) {
+                                var textureURL = imageProxy.attributes.images[0].url;
+                                var texture = {
+                                    url: textureURL,
+                                    type: textureMTLMap[object._channel._name],
+                                    ext: ext(textureURL)
+                                };
+                                texture.filename = textureFilename(geom, texture);
+                                textureMap.push(texture);
+                            }   
+                        }
+                    }
                 }
             });
         }
