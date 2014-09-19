@@ -12,6 +12,9 @@
 
 var models = [];
 var baseModelName = safeName(document.title.replace(' - Sketchfab', ''));
+if (/^_*$/.test(baseModelName)) {
+    baseModelName = makeid();
+}
 function overrideDrawImplementation() {
     OSG.osg.Geometry.prototype.originalDrawImplementation = OSG.osg.Geometry.prototype.drawImplementation;
     delete OSG.osg.Geometry.prototype.drawImplementation;
@@ -39,6 +42,17 @@ function overrideDrawImplementation() {
         }
     };
 }
+// source: http://stackoverflow.com/a/1349426
+function makeid()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    
+    return text;
+    }
 
 // source: http://stackoverflow.com/a/8485137
 function safeName(s) {
@@ -70,8 +84,6 @@ function InfoForGeometry(geom) {
     }
     return info;
 }
-
-var verticesExported = 0;
 var nl = '\n';
 function OBJforGeometry(geom) {
     var obj = '';
@@ -116,7 +128,7 @@ function OBJforGeometry(geom) {
                 if (isTriangleStrip && isOddFace) 
                     order = [ 0, 2, 1];
                 for (k = 0; k < 3; ++k) {
-                    var faceNum = primitive.indices[j + order[k]] + 1 + verticesExported;
+                    var faceNum = primitive.indices[j + order[k]] + 1;
                     obj += faceNum;
                     if (exist.normals && !exist.texCoords) {
                          obj += '//' + faceNum;
@@ -138,7 +150,6 @@ function OBJforGeometry(geom) {
             throw 'Primitive mode not implemented';
         }
     }
-    verticesExported += info.vertices.length / 3.0;
     return obj;
 }
 
@@ -314,17 +325,15 @@ function downloadModels() {
     	alert("Download script failed... try refreshing the page");
         return;
     }
-    var combinedOBJ = '';
-    var combinedMTL = '';
+    var modelNum = 0;
     models.forEach(function(model) {
-        combinedOBJ += model.obj + nl;
-        combinedMTL += model.mtl + nl;
+        ++modelNum;
+        downloadString(baseModelName + "-" + modelNum, 'obj', model.obj);
+        downloadString(baseModelName + "-" + modelNum, 'mtl', model.mtl);
         model.textures.forEach(function(texture) {
         	downloadFileAtURL(texture.url);
         });
     });
-    downloadString(baseModelName, 'obj', combinedOBJ);
-    downloadString(baseModelName, 'mtl', combinedMTL);
 }
 
 function addDownloadButton(downloadButtonParent) {
