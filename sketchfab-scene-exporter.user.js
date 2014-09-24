@@ -4,7 +4,7 @@
 // @author         Reinitialized
 //
 //Version Number
-// @version        1.06
+// @version        1.07
 //
 // Urls process this user script on
 // @include        /^https?://(www\.)?sketchfab\.com/models/.*/embed.*$/
@@ -242,13 +242,13 @@ function getElementByXpath(path) {
 
 var addedDownloadButton = false;
 var downloadButtonParentXPath = "//div[@class='controls']";
-var osgScriptElementPath = "//script[contains (@src, 'OSG')]";
+var osgScriptElementPath = "//script[contains (@src, 'sketchfab')]";
 var foundOsgScript = false;
 
 observeDOM(document.body, function(){ 
     if (!foundOsgScript) {
     	if (osgScript = getElementByXpath(osgScriptElementPath)) { 
-           osgScript.onload = overrideDrawImplementation;
+           overrideDrawImplementation();
            foundOsgScript = true;
     	}
     }
