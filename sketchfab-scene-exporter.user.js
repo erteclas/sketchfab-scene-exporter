@@ -176,7 +176,7 @@ function textureInfoForGeometry(geom) {
                                 var textureURL = imageProxy.attributes.images[0].url;
                                 var texture = {
                                     url: textureURL,
-                                    type: textureMTLMap[object._channel._name],
+                                    type: textureMTLMap[object._channelName],
                                     ext: ext(textureURL)
                                 };
                                 texture.filename = textureFilename(geom, texture);
