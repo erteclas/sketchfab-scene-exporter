@@ -4,19 +4,29 @@
 // @author         Reinitialized
 //
 //Version Number
-// @version        1.08
+// @version        1.09
 //
 // Urls process this user script on
 // @include        /^https?://(www\.)?sketchfab\.com/models/.*/embed.*$/
 // @grant none
 // ==/UserScript==
 
+function unfreeze(obj) {
+    var copy = {};
+    for(var i in obj) {
+       copy[i] = obj[i];
+    }
+    return copy;
+}
+
 var models = [];
 var baseModelName = safeName(document.title.replace(' - Sketchfab', ''));
 function overrideDrawImplementation() {
-    OSG.osg.Geometry.prototype.originalDrawImplementation = OSG.osg.Geometry.prototype.drawImplementation;
-    delete OSG.osg.Geometry.prototype.drawImplementation;
-    OSG.osg.Geometry.prototype.drawImplementation = function(a) {
+    var geometry = OSG.osg.Geometry;
+    var newPrototype = unfreeze(geometry.prototype);
+    geometry.prototype = newPrototype;
+    newPrototype.originalDrawImplementation = newPrototype.drawImplementation;
+    newPrototype.drawImplementation = function(a) {
         this.originalDrawImplementation(a);
         if (!this.computedOBJ) {
             this.computedOBJ = true;
