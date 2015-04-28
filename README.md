@@ -1,4 +1,4 @@
-sketchfab-scene-exporter
+sketchfab-scene-exporter - Deprecated
 ===================
 The goal of this script is to allow you to export the models contained in a Sketchfab scene to a Blender-ready format without ever leaving the browser.  
 
